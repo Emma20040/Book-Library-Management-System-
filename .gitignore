@@ -4,6 +4,12 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+.env
+.env.*
+src/main/resources/private.key
+src/main/resources/public.key
+application.properties
+
 ### STS ###
 .apt_generated
 .classpath
