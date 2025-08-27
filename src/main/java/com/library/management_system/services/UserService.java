@@ -1,0 +1,117 @@
+package com.library.management_system.services;
+
+import com.library.management_system.enums.Role;
+import com.library.management_system.models.UserModel;
+import com.library.management_system.repositories.UserRepository;
+import com.library.management_system.utils.JwtActions;
+import jakarta.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
+import java.util.UUID;
+
+
+@Service
+public class UserService {
+    @Value("${token.expiration:300}")
+    private Long tokenExpirationSeconds;
+
+    private final UserRepository userRepository;
+
+    private final JwtActions jwtActions;
+
+    private final EmailService emailService;
+
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+
+    public UserService(UserRepository userRepository, JwtActions jwtActions, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.userRepository = userRepository;
+        this.jwtActions = jwtActions;
+        this.emailService = emailService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    private Optional<UserModel> findUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    private Optional<UserModel> findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    private Optional<UserModel> findUserByEmailOrUsername(String emailOrUsername) {
+        Optional<UserModel> userByEmail = findUserByEmail((emailOrUsername));
+        if (userByEmail.isPresent()) {
+            return userByEmail;
+        }
+        return findUserByUsername(emailOrUsername);
+    }
+
+    private boolean verifyPassword(String rawPassword, String encodedPassword) {
+        return bCryptPasswordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    //    Register new user
+    public void registerUser(String email, String password, String username) {
+        if (findUserByEmail(email).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
+        }
+
+        var encodedPassword = bCryptPasswordEncoder.encode(password);
+
+        var newUser = new UserModel(null, username, email, encodedPassword, false, null, Role.USER);
+
+
+//        // Generate verification token and send email
+        String token = UUID.randomUUID().toString();
+        newUser.setVerificationToken(token);
+
+        String baseUrl ="http://localhost:8080";
+        String link = baseUrl + "/user/verify-email?token=" + token;
+        newUser.isEnabled(); //automatically set to false untill email is validated
+        try {
+            emailService.sendEmail(email, "Verify your email", "Click the link below to verify your email: " + link);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+        // Save user to database
+        userRepository.save(newUser);
+    }
+
+//    validating verification token
+public String validateVerificationToken(String token) {
+    UserModel user = userRepository.findByVerificationToken(token).orElse(null);
+    if (user == null) {
+        return "invalid";
+    }
+
+    user.setEnabled(true);
+    user.setVerificationToken(null); // Clear the token after verification
+    userRepository.save(user);
+    return "valid";
+}
+
+//login user and generate token
+    public String loginUser(String emailOrUsername, String password) {
+        var user = findUserByEmailOrUsername(emailOrUsername).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Invalid login credentials"));
+
+        if (!user.isEnabled()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email not verified verify email and try again");
+        }
+
+        if (!verifyPassword(password, user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid login credentials");
+        }
+        return jwtActions.jwtCreate(user.getId(),user.getUsername(),user.getEmail(), user.getRole().toString());
+    }
+
+}
+
+
+
