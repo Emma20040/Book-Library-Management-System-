@@ -1,0 +1,36 @@
+package com.library.management_system.utils;
+
+import com.library.management_system.configs.JwtConfig;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.UUID;
+
+@Service
+public class JwtActions {
+    @Value("${jwt.expiration:300}")
+    private Long jwtExpiration;
+
+    private final JwtConfig jwtConfig;
+
+    public JwtActions(JwtConfig jwtConfig) {
+        this.jwtConfig = jwtConfig;
+    }
+
+    public String jwtCreate(UUID id, String email ,String username, String role) {
+        var now = Instant.now();
+        var claims = JwtClaimsSet.builder()
+                .issuer("ReadQuest-Auth")
+                .subject(id.toString())
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(jwtExpiration))
+                .claim("email", email != null ? email : "")
+                .claim("username", username != null ? username : "")
+                .claim("role", role)
+                .build();
+        return jwtConfig.jwtEncoder().encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+}
