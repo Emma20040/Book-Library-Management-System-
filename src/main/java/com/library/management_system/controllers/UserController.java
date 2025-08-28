@@ -3,6 +3,9 @@ package com.library.management_system.controllers;
 import com.library.management_system.DTOs.LoginDTO;
 import com.library.management_system.DTOs.UserDTO;
 import com.library.management_system.services.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,4 +44,17 @@ public ResponseEntity<Map<String, String>> verifyEmail(@RequestParam String toke
         var token = userService.loginUser(loginDTO.emailOrUsername(), loginDTO.password());
         return ResponseEntity.ok(Map.of("token", token));
     }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, String>> logoutUser(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            userService.logoutUser(token);
+            return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
+        }
+        return ResponseEntity.badRequest().body(Map.of("error", "Invalid authorization header"));
+    }
+
 }

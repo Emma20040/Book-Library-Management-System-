@@ -2,6 +2,8 @@ package com.library.management_system.utils;
 
 import com.library.management_system.configs.JwtConfig;
 import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
@@ -33,4 +35,11 @@ public class JwtActions {
                 .build();
         return jwtConfig.jwtEncoder().encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
+
+
+//    decodes jwt
+    public Jwt decodeToken(String token) {
+        return jwtConfig.jwtDecoder().decode(token);
+    }
+
 }
