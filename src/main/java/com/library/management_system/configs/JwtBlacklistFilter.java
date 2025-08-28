@@ -1,4 +1,4 @@
-package com.library.management_system.configs;  // ← This package
+package com.library.management_system.configs;  
 
 import com.library.management_system.services.JwtValidationService;
 import jakarta.servlet.FilterChain;
