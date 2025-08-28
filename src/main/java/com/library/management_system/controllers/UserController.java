@@ -3,7 +3,9 @@ package com.library.management_system.controllers;
 import com.library.management_system.DTOs.LoginDTO;
 import com.library.management_system.DTOs.UserDTO;
 import com.library.management_system.services.UserService;
+
 import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +45,7 @@ public ResponseEntity<Map<String, String>> verifyEmail(@RequestParam String toke
         return ResponseEntity.ok(Map.of("token", token));
     }
 
+
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logoutUser(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
@@ -53,4 +56,5 @@ public ResponseEntity<Map<String, String>> verifyEmail(@RequestParam String toke
         }
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid authorization header"));
     }
+
 }

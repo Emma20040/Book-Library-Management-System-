@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,15 +30,18 @@ public class UserService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+
    private final JwtBlacklistService jwtBlacklistService;
 
 
     public UserService(UserRepository userRepository, JwtActions jwtActions, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtBlacklistService jwtBlacklistService, JwtValidationService jwtValidationService) {
+    
         this.userRepository = userRepository;
         this.jwtActions = jwtActions;
         this.emailService = emailService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtBlacklistService = jwtBlacklistService;
+
     }
 
     private Optional<UserModel> findUserByEmail(String email) {
@@ -115,6 +119,7 @@ public String validateVerificationToken(String token) {
         return jwtActions.jwtCreate(user.getId(),user.getUsername(),user.getEmail(), user.getRole().toString());
     }
 
+
 //    Logs out a user by blacklisting their jwt token
     public void logoutUser(String token) {
         try{
@@ -129,6 +134,7 @@ public String validateVerificationToken(String token) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token");
         }
     }
+
 
 }
 
