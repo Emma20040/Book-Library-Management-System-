@@ -43,6 +43,8 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/user/logout").authenticated()
                         .requestMatchers(HttpMethod.GET, "/user/verify-email").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user/redeem-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/user/reset-password").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(config -> config.jwt(jwt -> jwt.decoder(jwtConfig.jwtDecoder())
                         .jwtAuthenticationConverter(jwtAuthenticationConverter())))
@@ -66,4 +68,3 @@ public class SecurityConfig {
 
     }
 
-}

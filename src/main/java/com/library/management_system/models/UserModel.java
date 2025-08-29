@@ -27,10 +27,18 @@ public class UserModel {
 
     private String verificationToken;
 
-
     @Enumerated(EnumType.STRING)
     private Role role;
 
+//    password reset
+    @Column()
+    private String resetToken;
+
+    @Column
+    private Instant resetTokenExpiration;
+
+
+//empty user constructor
     public UserModel(){
 
     }
@@ -47,13 +55,21 @@ public class UserModel {
         this.role = role;
     }
 
+//    constructor for reset password
+public UserModel withResetToken(String resetToken, Instant resetTokenAdditionalTime) {
+    this.resetToken = resetToken;
+    this.resetTokenExpiration = resetTokenAdditionalTime;
+    return this;
+}
 
     //    /    getters and setters
     public UUID getId() {
+
         return id;
     }
 
     public void setId(UUID id) {
+
         this.id = id;
     }
 
@@ -70,14 +86,17 @@ public class UserModel {
     }
 
     public void setEmail(String email) {
+
         this.email = email;
     }
 
     public String getPassword() {
+
         return password;
     }
 
     public void setPassword(String password) {
+
         this.password = password;
     }
 
@@ -87,23 +106,44 @@ public class UserModel {
     }
 
     public void setRole(Role role) {
+
         this.role = role;
     }
 
 
     public boolean isEnabled() {
+
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
+
         this.enabled = enabled;
     }
 
     public String getVerificationToken() {
+
         return verificationToken;
     }
 
     public void setVerificationToken(String verificationToken) {
+
         this.verificationToken = verificationToken;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public Instant getResetTokenExpiration() {
+        return resetTokenExpiration;
+    }
+
+    public void setResetTokenExpiration(Instant resetTokenExpiration) {
+        this.resetTokenExpiration = resetTokenExpiration;
     }
 }
