@@ -136,6 +136,46 @@ public String validateVerificationToken(String token) {
     }
 
 
+//    send pasword reset email
+    public void sendPasswordResetEmail(String email, String token){
+        String baseUrl ="http://localhost:8080";
+        String link = baseUrl + "/user/reset?token=" + token;
+
+        try {
+            emailService.sendEmail(email, "Password Reset Request", "Click the link to reset your password:  " + link);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    find user, genearte token and send email
+    public void redeemPassword(String email){
+        var user = findUserByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                "Invalid email"));
+        var token = UUID.randomUUID().toString();
+        user.withResetToken(token, Instant.now().plusSeconds(this.tokenExpirationSeconds));
+
+        userRepository.save(user);
+        sendPasswordResetEmail(user.getEmail(), token);
+    }
+
+//    create new password
+    public void resetPassword(String token, String password){
+        Instant now = Instant.now();
+        var user = userRepository.findByResetToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "user not found"));
+        if (user.getResetTokenExpiration().isBefore(now)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "token expired");
+        }
+
+        user.setPassword(bCryptPasswordEncoder.encode(password));
+
+        user.withResetToken(null, null);
+        userRepository.save(user);
+    }
+
+
 }
 
 
