@@ -60,6 +60,7 @@ public class UserController {
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid authorization header"));
     }
 
+
     //    send email link toress password
     @PostMapping("/redeem-password")
     public ResponseEntity<Map<String, String>> redeemPassword(@RequestBody @Valid UserRedeemPasswordDto userRedeemPasswordDto) {
@@ -74,6 +75,7 @@ public class UserController {
         userService.resetPassword(userResetPasswordDto.token(), userResetPasswordDto.password());
         return ResponseEntity.ok().body(Map.of("message", "Credentials updated successfully"));
     }
+
 
 
 }

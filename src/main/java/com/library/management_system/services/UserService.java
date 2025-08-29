@@ -135,6 +135,7 @@ public String validateVerificationToken(String token) {
         }
     }
 
+
 //    send pasword reset email
     public void sendPasswordResetEmail(String email, String token){
         String baseUrl ="http://localhost:8080";
@@ -173,6 +174,7 @@ public String validateVerificationToken(String token) {
         user.withResetToken(null, null);
         userRepository.save(user);
     }
+
 
 }
 
