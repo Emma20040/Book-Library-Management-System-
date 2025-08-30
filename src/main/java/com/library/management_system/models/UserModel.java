@@ -25,6 +25,7 @@ public class UserModel {
     @Column(nullable = false, updatable = true)
     private boolean enabled = false;
 
+    @Column()
     private String verificationToken;
 
     @Enumerated(EnumType.STRING)
@@ -36,6 +37,30 @@ public class UserModel {
 
     @Column
     private Instant resetTokenExpiration;
+
+
+//    attributes for user profile
+    @Column()
+    private String firstName;
+
+    @Column()
+    private String lastName;
+
+    @Column()
+    private String address;
+
+    @Column()
+    private String bio;
+
+    @Column()
+    private String phoneNumber;
+
+    @Column()
+    private String country;
+
+    @Column()
+    private String profileImageUrl;
+
 
 
 //empty user constructor
@@ -62,7 +87,7 @@ public UserModel withResetToken(String resetToken, Instant resetTokenAdditionalT
     return this;
 }
 
-    //    /    getters and setters
+    //       getters and setters
     public UUID getId() {
 
         return id;
@@ -132,18 +157,89 @@ public UserModel withResetToken(String resetToken, Instant resetTokenAdditionalT
     }
 
     public String getResetToken() {
+
         return resetToken;
     }
 
     public void setResetToken(String resetToken) {
+
         this.resetToken = resetToken;
     }
 
     public Instant getResetTokenExpiration() {
+
         return resetTokenExpiration;
     }
 
     public void setResetTokenExpiration(Instant resetTokenExpiration) {
         this.resetTokenExpiration = resetTokenExpiration;
+    }
+
+//    getters and setters for user profile
+
+    public String getFirstName() {
+
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+
+        this.lastName = lastName;
+    }
+
+    public String getAddress() {
+
+        return address;
+    }
+
+    public void setAddress(String address) {
+
+        this.address = address;
+    }
+
+    public String getBio() {
+
+        return bio;
+    }
+
+    public void setBio(String bio) {
+
+        this.bio = bio;
+    }
+
+    public String getPhoneNumber() {
+
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getCountry() {
+
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }

@@ -22,7 +22,7 @@ public class JwtBlacklistService {
     }
 
 //    Scheduled task to clean up expired tokens from the blacklist
-    @Scheduled(fixedDelay = 10000) // Run every 1000 seconds
+    @Scheduled(fixedDelay = 10000) // Run every 10s (10000ms) seconds
     public void cleanupExpiredTokens() {
         Instant now = Instant.now();
         // automatically Remove tokens that have already expired

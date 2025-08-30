@@ -19,6 +19,7 @@ public class JwtActions {
     private final JwtConfig jwtConfig;
 
     public JwtActions(JwtConfig jwtConfig) {
+
         this.jwtConfig = jwtConfig;
     }
 
