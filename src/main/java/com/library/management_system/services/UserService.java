@@ -1,5 +1,7 @@
 package com.library.management_system.services;
 
+import com.library.management_system.DTOs.ProfileUpdateRequestDTO;
+import com.library.management_system.DTOs.UserProfileResponseDTO;
 import com.library.management_system.enums.Role;
 import com.library.management_system.models.UserModel;
 import com.library.management_system.repositories.UserRepository;
@@ -116,7 +118,7 @@ public String validateVerificationToken(String token) {
         if (!verifyPassword(password, user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid login credentials");
         }
-        return jwtActions.jwtCreate(user.getId(),user.getUsername(),user.getEmail(), user.getRole().toString());
+        return jwtActions.jwtCreate(user.getId(),user.getEmail(), user.getUsername(), user.getRole().toString());
     }
 
 
@@ -148,7 +150,7 @@ public String validateVerificationToken(String token) {
         }
     }
 
-//    find user, genearte token and send email
+//     genearte token for the user that wants to chande password and send email
     public void redeemPassword(String email){
         var user = findUserByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Invalid email"));
@@ -175,6 +177,66 @@ public String validateVerificationToken(String token) {
         userRepository.save(user);
     }
 
+
+//    -------USER PROFILE-------
+
+//    get user profile by email
+    public  UserProfileResponseDTO getUserProfile(String email){
+        UserModel user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not found"));
+        return mapToProfileResponseDTO(user);
+    }
+
+//only updates provided fields for user progile : patch
+public UserProfileResponseDTO updateUserProfile(String email, ProfileUpdateRequestDTO updateRequest) {
+    UserModel user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+    // Update only the profile fields that are provided (not null)
+    // Users can provide only the fields they want to update
+    if (updateRequest.firstName() != null) {
+        user.setFirstName(updateRequest.firstName());
+    }
+    if (updateRequest.lastName() != null) {
+        user.setLastName(updateRequest.lastName());
+    }
+    if (updateRequest.address() != null) {
+        user.setAddress(updateRequest.address());
+    }
+    if (updateRequest.country() != null) {
+        user.setCountry(updateRequest.country());
+    }
+    if (updateRequest.profileImageUrl() != null) {
+        user.setProfileImageUrl(updateRequest.profileImageUrl());
+    }
+    if (updateRequest.bio() != null) {
+        user.setBio(updateRequest.bio());
+    }
+    if (updateRequest.phoneNumber() != null) {
+        user.setPhoneNumber(updateRequest.phoneNumber());
+    }
+
+    UserModel updatedUser = userRepository.save(user);
+    return mapToProfileResponseDTO(updatedUser);
+}
+
+
+//    helper method
+private UserProfileResponseDTO mapToProfileResponseDTO(UserModel user) {
+    return new UserProfileResponseDTO(
+            user.getId(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getRole(),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getCountry(),
+            user.getAddress(),
+            user.getProfileImageUrl(),
+            user.getBio(),
+            user.getPhoneNumber()
+    );
+}
 
 }
 

@@ -43,6 +43,8 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/user/logout").authenticated()
                         .requestMatchers(HttpMethod.GET, "/user/verify-email").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user/profile").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/user/profile").authenticated()
                         .requestMatchers(HttpMethod.POST, "/user/redeem-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user/reset-password").permitAll()
                         .anyRequest().authenticated())
@@ -69,4 +71,4 @@ public class SecurityConfig {
     }
 
 
-}
+
