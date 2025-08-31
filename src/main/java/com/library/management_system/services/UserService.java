@@ -1,6 +1,7 @@
 package com.library.management_system.services;
 
 import com.library.management_system.DTOs.ProfileUpdateRequestDTO;
+import com.library.management_system.DTOs.UserDTO;
 import com.library.management_system.DTOs.UserProfileResponseDTO;
 import com.library.management_system.enums.Role;
 import com.library.management_system.models.UserModel;
@@ -221,7 +222,15 @@ public UserProfileResponseDTO updateUserProfile(String email, ProfileUpdateReque
 }
 
 
-//    helper method
+//method for admin to get user info by username using user profile
+    public UserProfileResponseDTO getUserProfileByUsername(String username){
+        UserModel user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not found"));
+        return mapToProfileResponseDTO(user);
+    }
+
+
+//    helper method for user profile
 private UserProfileResponseDTO mapToProfileResponseDTO(UserModel user) {
     return new UserProfileResponseDTO(
             user.getId(),
@@ -237,6 +246,14 @@ private UserProfileResponseDTO mapToProfileResponseDTO(UserModel user) {
             user.getPhoneNumber()
     );
 }
+
+
+//count the total number of users
+    public long countUsers() {
+        return userRepository.count();
+    }
+
+
 
 }
 
