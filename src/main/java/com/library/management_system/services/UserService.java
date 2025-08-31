@@ -1,7 +1,6 @@
 package com.library.management_system.services;
 
 import com.library.management_system.DTOs.ProfileUpdateRequestDTO;
-import com.library.management_system.DTOs.UserDTO;
 import com.library.management_system.DTOs.UserProfileResponseDTO;
 import com.library.management_system.enums.Role;
 import com.library.management_system.models.UserModel;
@@ -247,10 +246,70 @@ private UserProfileResponseDTO mapToProfileResponseDTO(UserModel user) {
     );
 }
 
+//--------- ADMIN FUNCTIONS RELATED TO USERS -----------
 
 //count the total number of users
     public long countUsers() {
         return userRepository.count();
+    }
+
+
+// Delete user
+    public void deleteUser(String username, String currentAdmin){
+        UserModel user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not found "));
+
+        if (user.getRole() == Role.ADMIN) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "can not delete another admin");
+
+        }
+
+        if( username.equals(currentAdmin)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "can not delete your account");
+        }
+
+        userRepository.delete(user);
+
+    }
+
+
+//    suspend user
+    public void suspendUser(String username, String currentAdmin){
+        UserModel  user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "can't find user"));
+
+        if (user.getRole() == Role.ADMIN){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "can't suspend another admin");
+        }
+
+        if (username.equals(currentAdmin)){
+            throw  new ResponseStatusException(HttpStatus.FORBIDDEN, "can not suspen your own");
+        }
+
+        user.setEnabled(false);
+        userRepository.save(user);
+    }
+
+//    activate suspended user account
+    public void activateUser(String username, String currentAdmin){
+        UserModel user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "can't find user"));
+
+        if (user.getRole() == Role.ADMIN){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "can't activate another admin");
+        }
+
+        if (username.equals(currentAdmin)){
+            throw  new ResponseStatusException(HttpStatus.FORBIDDEN, "can not activate your own");
+        }
+
+        if (user.isEnabled()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "user is already active");
+        }
+
+        user.setEnabled(true);
+        userRepository.save(user);
+
     }
 
 
