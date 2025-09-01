@@ -21,7 +21,7 @@ import java.util.UUID;
 
 @Service
 public class UserService {
-    @Value("${token.expiration:300}")
+    @Value("${token.expiration:900}")
     private Long tokenExpirationSeconds;
 
     private final UserRepository userRepository;
@@ -138,6 +138,7 @@ public String validateVerificationToken(String token) {
     }
 
 
+//    -------- PASSWORD RESET --------
 //    send pasword reset email
     public void sendPasswordResetEmail(String email, String token){
         String baseUrl ="http://localhost:8080";
