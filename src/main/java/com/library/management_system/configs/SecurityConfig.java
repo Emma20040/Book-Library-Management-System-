@@ -47,6 +47,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/user/profile").authenticated()
                         .requestMatchers(HttpMethod.POST, "/user/redeem-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/user/reset-password").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/user/admin/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/countUsers").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(config -> config.jwt(jwt -> jwt.decoder(jwtConfig.jwtDecoder())
                         .jwtAuthenticationConverter(jwtAuthenticationConverter())))
