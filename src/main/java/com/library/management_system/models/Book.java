@@ -1,4 +1,5 @@
-package com.dev_squad.book_library_backend.model;
+package com.library.management_system.models;
+
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
