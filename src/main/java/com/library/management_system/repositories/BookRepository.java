@@ -1,7 +1,9 @@
-package com.dev_squad.book_library_backend.repository;
+package com.library.management_system.repositories;
 
 
-import com.dev_squad.book_library_backend.model.Book;
+
+
+import com.library.management_system.models.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 // The JpaRepository takes two generic types:
@@ -11,3 +13,4 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     // You can also define custom methods here if you need more than the basic CRUD operations
     // For example: List<Book> findByAuthor(String author);
 }
+

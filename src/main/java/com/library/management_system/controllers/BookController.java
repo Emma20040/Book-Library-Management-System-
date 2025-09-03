@@ -1,7 +1,9 @@
-package com.dev_squad.book_library_backend.controller;
+package com.library.management_system.controllers;
 
-import com.dev_squad.book_library_backend.model.Book;
-import com.dev_squad.book_library_backend.repository.BookRepository;
+
+
+import com.library.management_system.models.Book;
+import com.library.management_system.repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus; // Import for HTTP status codes
 import org.springframework.http.ResponseEntity;
