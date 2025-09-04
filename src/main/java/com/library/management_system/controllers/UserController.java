@@ -2,6 +2,10 @@ package com.library.management_system.controllers;
 
 import java.util.Map;
 
+import com.library.management_system.services.FileStorageService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -25,14 +29,16 @@ import com.library.management_system.services.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
     private UserService userService;
+    private final FileStorageService fileStorageService;
 
-    public UserController(UserService userService) {
-
+    public UserController(UserService userService, FileStorageService fileStorageService) {
+        this.fileStorageService= fileStorageService;
         this.userService = userService;
     }
 
@@ -112,6 +118,56 @@ public class UserController {
         UserProfileResponseDTO updatedProfile = userService.updateUserProfile(email, updateProfileRequest);
         return ResponseEntity.ok(updatedProfile);
     }
+
+//    Upload profile picture endpoint
+@PostMapping(value = "/profile/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ResponseEntity<UserProfileResponseDTO> uploadProfilePicture(
+        @AuthenticationPrincipal Jwt jwt,
+        @RequestParam("image") MultipartFile imageFile) {
+    String email = jwt.getClaim("email");
+    String imageUrl = userService.uploadProfilePicture(email, imageFile);
+
+    ProfileUpdateRequestDTO updateRequest = new ProfileUpdateRequestDTO(
+            null,
+            null,
+            null,
+            null,
+            imageUrl,
+            null,
+            null
+    );
+
+    UserProfileResponseDTO updatedProfile = userService.updateUserProfile(email, updateRequest);
+    return ResponseEntity.ok(updatedProfile);
+}
+
+//get profile picture
+    @GetMapping("/profile/picture")
+    public ResponseEntity<Resource> getProfilePicture(
+            @AuthenticationPrincipal Jwt jwt) {
+        String email = jwt.getClaim("email");
+        Resource imageResource = userService.getProfileImage(email);
+
+        String filename = imageResource.getFilename();
+        String contentType = fileStorageService.determineContentType(filename);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .body(imageResource);
+    }
+
+
+    // -------- DELETE Profile Picture --------
+    @DeleteMapping("/profile/picture")
+    public ResponseEntity<UserProfileResponseDTO> deleteProfilePicture(
+            @AuthenticationPrincipal Jwt jwt) {
+        String email = jwt.getClaim("email");
+        UserProfileResponseDTO updatedProfile = userService.deleteProfilePicture(email);
+        return ResponseEntity.ok(updatedProfile);
+    }
+
+
+
 
     //    admin route to get user profile infor via username
     @GetMapping("/admin/users/{username}")

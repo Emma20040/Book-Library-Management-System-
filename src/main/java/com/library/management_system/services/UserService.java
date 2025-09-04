@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.core.io.Resource;
 
 
 import java.time.Instant;
@@ -32,17 +34,19 @@ public class UserService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    private final JwtBlacklistService jwtBlacklistService;
 
-   private final JwtBlacklistService jwtBlacklistService;
+    private final FileStorageService fileStorageService;
 
 
-    public UserService(UserRepository userRepository, JwtActions jwtActions, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtBlacklistService jwtBlacklistService, JwtValidationService jwtValidationService) {
+    public UserService(UserRepository userRepository, JwtActions jwtActions, EmailService emailService, BCryptPasswordEncoder bCryptPasswordEncoder, JwtBlacklistService jwtBlacklistService, JwtValidationService jwtValidationService, FileStorageService fileStorageService) {
     
         this.userRepository = userRepository;
         this.jwtActions = jwtActions;
         this.emailService = emailService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtBlacklistService = jwtBlacklistService;
+        this.fileStorageService = fileStorageService;
 
     }
 
@@ -221,13 +225,73 @@ public UserProfileResponseDTO updateUserProfile(String email, ProfileUpdateReque
     return mapToProfileResponseDTO(updatedUser);
 }
 
+//-------- HANDLING user profile image ----------
 
-//method for admin to get user info by username using user profile
-    public UserProfileResponseDTO getUserProfileByUsername(String username){
-        UserModel user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not found"));
-        return mapToProfileResponseDTO(user);
+//    Upload profile picture - returns the image URL only
+    public String uploadProfilePicture(String email, MultipartFile profileImage) {
+        UserModel user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        try {
+            // Generate safe filename
+            String filename = generateProfileImageFilename(email, profileImage.getOriginalFilename());
+
+            // Use FileStorageService to store the image
+            String filePath = fileStorageService.storeProfilePicture(profileImage, filename);
+
+            // Delete old profile image if exists
+            if (user.getProfileImageUrl() != null) {
+                fileStorageService.deleteFile(user.getProfileImageUrl());
+            }
+
+            // Return the file path (URL) - caller can use this in updateUserProfile
+            return filePath;
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload profile image: " + e.getMessage());
+        }
     }
+
+
+//    Get profile image
+    public Resource getProfileImage(String email) {
+        UserModel user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (user.getProfileImageUrl() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User has no profile image");
+        }
+
+        // Extract filename from stored path and load using FileStorageService
+        String filename = fileStorageService.extractFilenameFromPath(user.getProfileImageUrl());
+        return fileStorageService.loadProfilePicture(filename);
+    }
+
+
+    // Delete profile picture - returns updated user profile as Response DTO
+    public UserProfileResponseDTO deleteProfilePicture(String email) {
+        UserModel user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (user.getProfileImageUrl() != null) {
+            fileStorageService.deleteFile(user.getProfileImageUrl());
+            user.setProfileImageUrl(null);
+            UserModel updatedUser = userRepository.save(user);
+            return mapToProfileResponseDTO(updatedUser); // Return Response DTO
+        }
+
+        return mapToProfileResponseDTO(user); // Return Response DTO
+    }
+
+
+    // Helper method to generate safe filename for profile image
+    private String generateProfileImageFilename(String email, String originalFilename) {
+        String cleanEmail = email.replaceAll("[^a-zA-Z0-9]", "-").toLowerCase();
+        String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        return cleanEmail + "-profile-" + System.currentTimeMillis() + extension;
+    }
+
+
 
 
 //    helper method for user profile
@@ -247,11 +311,20 @@ private UserProfileResponseDTO mapToProfileResponseDTO(UserModel user) {
     );
 }
 
+
 //--------- ADMIN FUNCTIONS RELATED TO USERS -----------
 
 //count the total number of users
     public long countUsers() {
         return userRepository.count();
+    }
+
+
+    //method for admin to get user info by username using user profile
+    public UserProfileResponseDTO getUserProfileByUsername(String username){
+        UserModel user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not found"));
+        return mapToProfileResponseDTO(user);
     }
 
 
