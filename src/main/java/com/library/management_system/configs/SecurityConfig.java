@@ -136,13 +136,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/user/admin/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/user/admin/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/countUsers").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.GET, "/api/books/**").hasRole("ADMIN") // FIXED: This was being blocked by anyRequest()
                         .requestMatchers(HttpMethod.POST, "/api/books/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/books/**").hasRole("ADMIN")
 
-                        // 4. THE CATCH-ALL RULE - MUST BE LAST
-                        .anyRequest().authenticated() // Now this will only catch requests that didn't match any rule above
+                        // 4. THE CATCH-ALL RULE this is just a debuging will i will adjust letter
+                        .anyRequest().authenticated() //  
                 )
+
                 .oauth2ResourceServer(config -> config.jwt(jwt -> jwt.decoder(jwtConfig.jwtDecoder())
                         .jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .addFilterBefore(new JwtBlacklistFilter(jwtValidationService), BearerTokenAuthenticationFilter.class);

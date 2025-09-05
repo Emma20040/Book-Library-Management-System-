@@ -1,12 +1,16 @@
 package com.library.management_system.models;
 
 
+
 import jakarta.persistence.*;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+
 import java.time.LocalDateTime;
+
 
 @Entity // Marks this class as a JPA entity, mapped to a table in the database
 @Data // From Lombok, automatically generates getters, setters, toString, etc.
@@ -22,6 +26,7 @@ public class Book {
     private String author;
     private String isbn;
     private String publishedDate;
+
     private String description;
     private String genre;
 
@@ -48,6 +53,7 @@ public class Book {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
 
 
 }
