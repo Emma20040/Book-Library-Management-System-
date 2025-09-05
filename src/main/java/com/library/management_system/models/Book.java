@@ -1,13 +1,16 @@
 package com.library.management_system.models;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
+import jakarta.persistence.*;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+
+
+import java.time.LocalDateTime;
+
 
 @Entity // Marks this class as a JPA entity, mapped to a table in the database
 @Data // From Lombok, automatically generates getters, setters, toString, etc.
@@ -23,4 +26,34 @@ public class Book {
     private String author;
     private String isbn;
     private String publishedDate;
+
+    private String description;
+    private String genre;
+
+    @Column(name = "pdf_path")
+    private String pdfPath;
+
+    @Column(name = "cover_image_path")
+    private String coverImagePath;
+
+
+    //    / set columns to nullable to avoid migrations issues, which i am going to change later
+    @Column(name = "created_at", nullable = true, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable =true, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+
+
 }
