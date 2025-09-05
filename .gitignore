@@ -8,7 +8,7 @@ target/
 .env.*
 src/main/resources/private.key
 src/main/resources/public.key
-
+application.properties
 
 ### STS ###
 .apt_generated

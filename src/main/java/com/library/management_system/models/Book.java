@@ -23,6 +23,7 @@ public class Book {
     private String isbn;
     private String publishedDate;
     private String description;
+    private String genre;
 
     @Column(name = "pdf_path")
     private String pdfPath;

@@ -76,6 +76,7 @@ public class FileStorageService {
         }
     }
 
+//    extract filename from path
     public String extractFilenameFromPath(String path) {
         return Paths.get(path).getFileName().toString();
     }
@@ -86,6 +87,8 @@ public class FileStorageService {
         return storeFile(file, pdfStorageLocation, filename);
     }
 
+
+//    load pdf
     public Resource loadPdf(String filename) {
         return loadFile(pdfStorageLocation, filename);
     }
@@ -96,10 +99,14 @@ public class FileStorageService {
         return storeFile(file, coverImageStorageLocation, filename);
     }
 
+
+//    load cover image of book
     public Resource loadCoverImage(String filename) {
         return loadFile(coverImageStorageLocation, filename);
     }
 
+
+//    determine content type of file to upload
     public String determineContentType(String filename) {
         if (filename == null) {
             return "application/octet-stream";

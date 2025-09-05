@@ -137,7 +137,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/user/admin/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/countUsers").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/books/**").hasRole("ADMIN") // FIXED: This was being blocked by anyRequest()
-                        .requestMatchers(HttpMethod.POST, "/api/books/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/books/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/books/**").hasRole("ADMIN")
 
                         // 4. THE CATCH-ALL RULE - MUST BE LAST
