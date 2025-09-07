@@ -30,23 +30,31 @@ package com.library.management_system.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration
-public class WebConfig {
+import java.util.List;
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // Apply to ALL endpoints in the application
-                        .allowedOrigins("*") // Allow all origins for development
-                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                        .allowedHeaders("*") // Allow all headers
-                        .allowCredentials(false);
-            }
-        };
-    }
-}
+//@Configuration
+//public class WebConfig {
+
+
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                CorsConfiguration config = new CorsConfiguration();
+//                registry.addMapping("/**") // Apply to ALL endpoints in the application
+//                        .allowedOrigins(
+//                                "http://localhost:5502"
+//                        )
+//                        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+//                        .allowedHeaders("*") // Allow all headers
+//                        .allowCredentials(true);
+//            }
+//        };
+//    }
+//}

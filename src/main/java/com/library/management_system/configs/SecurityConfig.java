@@ -1,153 +1,94 @@
-//package com.library.management_system.configs;
-//
-//
-//import com.library.management_system.services.JwtValidationService;
-//
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.http.HttpMethod;
-//import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-//
-//import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
-//import org.springframework.security.web.SecurityFilterChain;
-//
-//import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-//import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-//import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
-//
-//
-//@Configuration
-//@EnableWebSecurity
-//@EnableMethodSecurity
-//public class SecurityConfig {
-//    private JwtConfig jwtConfig;
-//
-//    private JwtValidationService jwtValidationService;
-//
-//    public SecurityConfig(JwtConfig jwtConfig, JwtValidationService jwtValidationService) {
-//        this.jwtValidationService= jwtValidationService;
-//        this.jwtConfig = jwtConfig;
-//}
-//
-//
-//
-//
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(csrf -> csrf.disable())
-//                .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.POST, "/user/register").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/user/login").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/user/register").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/user/logout").authenticated()
-//                        .requestMatchers(HttpMethod.GET, "/user/verify-email").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/user/profile").authenticated()
-//                        .requestMatchers(HttpMethod.PATCH, "/user/profile").authenticated()
-//                        .requestMatchers(HttpMethod.POST, "/user/redeem-password").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/user/reset-password").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/user/admin/users/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE, "/user/admin/users/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.PATCH, "/user/admin/users/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.GET, "/countUsers").hasRole("ADMIN")
-//
-//                        .requestMatchers(HttpMethod.GET, "/api/books").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.POST, "/api/books").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.PATCH, "/api/books").hasRole("ADMIN")
-//                        .anyRequest().authenticated())
-//                .oauth2ResourceServer(config -> config.jwt(jwt -> jwt.decoder(jwtConfig.jwtDecoder())
-//                        .jwtAuthenticationConverter(jwtAuthenticationConverter())))
-//                // Add custom filter to validate tokens against blacklist
-//                .addFilterBefore(new JwtBlacklistFilter(jwtValidationService), BearerTokenAuthenticationFilter.class);;
-//
-//
-//        return http.build();
-//    }
-//
-//    @Bean
-//    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-//        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-//        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
-//        grantedAuthoritiesConverter.setAuthoritiesClaimName("role");
-//
-//        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-//        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
-//        return jwtAuthenticationConverter;
-//    }
-//
-//    }
-
 package com.library.management_system.configs;
 
-
 import com.library.management_system.services.JwtValidationService;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-
-import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
-import org.springframework.security.web.SecurityFilterChain;
-
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    private JwtConfig jwtConfig;
-
-    private JwtValidationService jwtValidationService;
+    private final JwtConfig jwtConfig;
+    private final JwtValidationService jwtValidationService;
 
     public SecurityConfig(JwtConfig jwtConfig, JwtValidationService jwtValidationService) {
-        this.jwtValidationService= jwtValidationService;
         this.jwtConfig = jwtConfig;
+        this.jwtValidationService = jwtValidationService;
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList(
+                "http://127.0.0.1:5502",
+                "http://localhost:5502"
 
+//                "https://e218876891ff.ngrok-free.app"
+        ));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("*"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
 
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // 1. PUBLIC ENDPOINTS (permitAll) - Most Specific
-                        .requestMatchers(HttpMethod.POST, "/user/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/user/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/user/verify-email").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/user/redeem-password").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/user/reset-password").permitAll()
+                        // PUBLIC ENDPOINTS - should not go through JWT validation
+                        .requestMatchers(
+                                "/user/register",
+                                "/user/login",
+                                "/user/verify-email",
+                                "/user/redeem-password",
+                                "/user/reset-password",
+                                "/api/books/**",
+                                "/api/books/search/**"
+                        ).permitAll()
 
-                        // 2. AUTHENTICATED ENDPOINTS (Specific paths & methods)
+                        // AUTHENTICATED ENDPOINTS
                         .requestMatchers(HttpMethod.POST, "/user/logout").authenticated()
                         .requestMatchers(HttpMethod.GET, "/user/profile").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/user/profile").authenticated()
 
-                        // 3. ROLE-BASED ENDPOINTS (Specific paths & methods)
-                        .requestMatchers(HttpMethod.GET, "/user/admin/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/user/admin/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/user/admin/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/countUsers").hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").hasRole("ADMIN") // FIXED: This was being blocked by anyRequest()
-                        .requestMatchers(HttpMethod.POST, "/api/books/**").permitAll()
+                        // ADMIN ENDPOINTS
+                        .requestMatchers("/user/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/books").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/books/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
+                        .requestMatchers("/countUsers").hasRole("ADMIN")
 
-                        // 4. THE CATCH-ALL RULE this is just a debuging will i will adjust letter
-                        .anyRequest().authenticated() //  
+                        // DEFAULT
+                        .anyRequest().authenticated()
                 )
-
-                .oauth2ResourceServer(config -> config.jwt(jwt -> jwt.decoder(jwtConfig.jwtDecoder())
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter())))
-                .addFilterBefore(new JwtBlacklistFilter(jwtValidationService), BearerTokenAuthenticationFilter.class);
+                // Only enable OAuth2 for authenticated routes, not public ones
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt
+                                .decoder(jwtConfig.jwtDecoder())
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
+                )
+                // Add JWT blacklist filter only for authenticated routes
+                .addFilterBefore(new JwtBlacklistFilter(jwtValidationService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -162,12 +103,4 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
-
 }
-
-
-
-
-//
-//
-//

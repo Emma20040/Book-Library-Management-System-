@@ -43,6 +43,7 @@ public class BookController {
 
     @GetMapping
     public List<BookResponseDTO> getAllBooks() {
+
         return bookService.getAllBooks();
     }
 
@@ -76,7 +77,7 @@ public class BookController {
     }
 
 
-//      Get book PDF file for reading/downloading
+//      Get book PDF file for reading
     @GetMapping("/{id}/pdf")
     public ResponseEntity<Resource> getBookPdf(@PathVariable Long id) {
         Resource pdfResource = bookService.getBookPdf(id);
