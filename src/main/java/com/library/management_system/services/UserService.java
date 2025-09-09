@@ -86,6 +86,7 @@ public class UserService {
         newUser.setVerificationToken(token);
 
         String baseUrl ="http://localhost:8080";
+//        String baseUrl ="https://e218876891ff.ngrok-free.app";
         String link = baseUrl + "/user/verify-email?token=" + token;
         newUser.isEnabled(); //automatically set to false untill email is validated
         try {
