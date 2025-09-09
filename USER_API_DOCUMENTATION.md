@@ -26,7 +26,21 @@
 
 ## Endpoints
 
-### 1. User Registration
+### 1. Get User Count (Admin)
+**Endpoint:** `GET /user/countUsers`  
+**Headers:**
+```
+Authorization: Bearer <admin_token>
+```
+**Response:**
+```json
+42
+```
+**Notes:**
+- Returns the total number of users in the system
+- Requires admin privileges
+
+### 2. User Registration
 **Endpoint:** `POST /user/register`  
 **Request Body:**
 ```json
@@ -129,6 +143,45 @@ Content-Type: application/json
 ```
 **Response:** Updated user profile (same structure as GET /user/profile)
 
+### 6.1 Upload Profile Picture
+**Endpoint:** `POST /user/profile/picture`  
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+```
+**Request Body:**
+```
+image: <binary_image_data>
+```
+**Response:** Updated user profile with new image URL
+**Notes:**
+- Accepts common image formats (JPG, PNG, etc.)
+- Maximum file size is 5MB
+- Returns the updated user profile with the new image URL
+
+### 6.2 Get Profile Picture
+**Endpoint:** `GET /user/profile/picture`  
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+**Response:** Binary image data with appropriate Content-Type header
+**Notes:**
+- Returns the raw image data
+- Includes proper Content-Type header based on the image format
+
+### 6.3 Delete Profile Picture
+**Endpoint:** `DELETE /user/profile/picture`  
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+**Response:** Updated user profile with profile picture set to null
+**Notes:**
+- Removes the user's profile picture
+- Returns the updated user profile with profileImageUrl set to null
+
 ### 7. Password Reset Request
 **Endpoint:** `POST /user/redeem-password`  
 **Request Body:**
@@ -226,29 +279,28 @@ Common error responses include:
 - 404: Not Found (resource not found)
 
 ## Frontend Implementation Notes
-1. **Token Storage**:
-   - Store the JWT token in localStorage or httpOnly cookies after successful login
-   - Implement token refresh logic if your application supports it
+1. **Authentication Flow**:
+   - Store the JWT token in memory or secure storage after login
+   - Include the token in the Authorization header for all authenticated requests
+   - Handle token expiration and implement automatic logout when the token expires
 
-2. **Request Headers**:
-   - Include the token in the Authorization header for authenticated requests:
-     ```
-     Authorization: Bearer <your_jwt_token>
-     ```
-   - Set Content-Type header for requests with body:
-     ```
-     Content-Type: application/json
-     ```
+2. **Error Handling**:
+   - Check for 401 Unauthorized responses and redirect to login
+   - Display user-friendly error messages for common error cases
+   - Implement retry logic for failed requests when appropriate
 
-3. **Error Handling**:
-   - Implement global error handling for:
-     - 401 Unauthorized: Redirect to log in
-     - 403 Forbidden: Show access denied message
-     - 400 Bad Request: Display validation errors to the user
-     - 500 Internal Server Error: Show generic error message
+3. **File Uploads**:
+   - Use FormData for file uploads
+   - Show upload progress to users
+   - Validate file types and sizes before upload
+   - For profile pictures, consider implementing client-side image resizing before upload
+   - Display a loading state during upload and update the UI immediately after successful upload
 
-4. **Form Validation**:
-   - Implement client-side validation to match backend validation rules
+4. **Profile Picture Implementation**:
+   - Use the `/user/profile/picture` endpoint as the image source for profile pictures
+   - Implement a fallback avatar when no profile picture is set
+   - For better performance, consider using a CDN or image optimization service
+   - Cache profile pictures locally to reduce server requests
    - Show clear error messages for invalid inputs
 
 5. **Loading States**:

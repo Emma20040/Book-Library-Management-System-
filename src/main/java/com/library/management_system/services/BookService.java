@@ -6,6 +6,8 @@ import com.library.management_system.DTOs.BookResponseDTO;
 import com.library.management_system.models.Book;
 import com.library.management_system.repositories.BookRepository;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -170,4 +172,14 @@ public BookResponseDTO updateBook(Long id, BookRequestDTO bookRequest, Multipart
         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         return cleanTitle + "-cover-" + System.currentTimeMillis() + extension;
     }
+
+//    search book by title or author or genre with recomadation if search doesn't exist
+public Page<Book> primarySearch(String searchWord, Pageable pageable) {
+    try {
+        return bookRepository.primarySearch(searchWord, pageable);
+    } catch (Exception e) {
+        // Fallback to recommendation search if primary search is not found
+        return bookRepository.recommendationSearch(searchWord, pageable);
+    }
+}
 }

@@ -18,6 +18,7 @@ public class JwtValidationService {
     //    Validates a JWT token by checking: signature validity, expiration and Blacklist status
     public boolean isValidToken(String token) {
         try {
+
 //// Decode and validate token signature/expiration
             Jwt jwt = jwtDecoder.decode(token);
 

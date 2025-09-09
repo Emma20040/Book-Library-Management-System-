@@ -54,15 +54,15 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // PUBLIC ENDPOINTS - should not go through JWT validation
+                        // PUBLIC ENDPOINTS - Endpoints which will not go through JWT validation
                         .requestMatchers(
                                 "/user/register",
                                 "/user/login",
                                 "/user/verify-email",
                                 "/user/redeem-password",
                                 "/user/reset-password",
-                                "/api/books/**",
-                                "/api/books/search/**"
+                                "/api/books/search"
+
                         ).permitAll()
 
                         // AUTHENTICATED ENDPOINTS
@@ -76,18 +76,16 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers("/countUsers").hasRole("ADMIN")
-
-                        // DEFAULT
                         .anyRequest().authenticated()
                 )
-                // Only enable OAuth2 for authenticated routes, not public ones
+
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
                                 .decoder(jwtConfig.jwtDecoder())
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                 )
-                // Add JWT blacklist filter only for authenticated routes
+
                 .addFilterBefore(new JwtBlacklistFilter(jwtValidationService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
