@@ -61,7 +61,8 @@ public class SecurityConfig {
                                 "/user/verify-email",
                                 "/user/redeem-password",
                                 "/user/reset-password",
-                                "/api/books/search"
+                                "/api/books/search",
+                                "/webhook/payment"
 
                         ).permitAll()
 
@@ -69,6 +70,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/user/logout").authenticated()
                         .requestMatchers(HttpMethod.GET, "/user/profile").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/user/profile").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/payments/create").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/payments/access/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/payments/transactions").authenticated()
 
                         // ADMIN ENDPOINTS
                         .requestMatchers("/user/admin/**").hasRole("ADMIN")
@@ -76,6 +80,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers("/countUsers").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/user/admin/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/user/admin/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/user/admin/users/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
 

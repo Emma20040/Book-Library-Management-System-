@@ -47,7 +47,6 @@ public class BookController {
 
 
 //      Get all books
-
     @GetMapping
     public List<BookResponseDTO> getAllBooks() {
 
@@ -110,7 +109,6 @@ public class BookController {
     }
 
 //    search book
-
     @GetMapping("/search")
     public ResponseEntity<?> getAllBooks(
             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
