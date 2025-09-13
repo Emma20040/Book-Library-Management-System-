@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -29,12 +30,16 @@ public class Book {
 
     private String description;
     private String genre;
+    private int numberOfPages;
 
     @Column(name = "pdf_path")
     private String pdfPath;
 
     @Column(name = "cover_image_path")
     private String coverImagePath;
+
+    @Column(name="price_per_month", nullable = false)
+    private BigDecimal pricePerMonth;
 
 
     //    / set columns to nullable to avoid migrations issues, which i am going to change later
