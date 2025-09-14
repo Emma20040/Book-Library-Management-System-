@@ -44,6 +44,11 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "LOWER(genre) LIKE LOWER(CONCAT('%', :searchWord, '%'))",
             nativeQuery = true)
     Page<Book> recommendationSearch(@Param("searchWord") String searchWord, Pageable pageable);
+
+//    find book by genre
+    Page<Book> findByGenre(String genre, Pageable pageable);
+
+    long count();
 }
 
 

@@ -1,9 +1,15 @@
 package com.library.management_system.controllers;
 
+import java.util.List;
 import java.util.Map;
 
+import com.library.management_system.DTOs.*;
 import com.library.management_system.services.FileStorageService;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.library.management_system.DTOs.LoginDTO;
-import com.library.management_system.DTOs.ProfileUpdateRequestDTO;
-import com.library.management_system.DTOs.UserDTO;
-import com.library.management_system.DTOs.UserProfileResponseDTO;
-import com.library.management_system.DTOs.UserRedeemPasswordDto;
-import com.library.management_system.DTOs.UserResetPasswordDto;
 import com.library.management_system.services.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -168,7 +168,6 @@ public ResponseEntity<UserProfileResponseDTO> uploadProfilePicture(
 
 
 
-
     //    admin route to get user profile infor via username
     @GetMapping("/admin/users/{username}")
     public ResponseEntity<UserProfileResponseDTO> getUserProfileByUsername(@PathVariable String username) {
@@ -202,13 +201,34 @@ public ResponseEntity<UserProfileResponseDTO> uploadProfilePicture(
         return ResponseEntity.ok(Map.of("message", "User suspended successfully"));
     }
 
-//    activate user
+//    activate user account
     @PatchMapping("/admin/users/{username}/activate")
     public ResponseEntity<Map<String, String>> activateUser(@PathVariable String username,
                                                            @AuthenticationPrincipal Jwt jwt) {
         String currentAdmin = jwt.getClaim("username");
         userService.activateUser(username, currentAdmin);
         return ResponseEntity.ok(Map.of("message", "User activated successfully"));
+    }
+
+
+//    get all user profiles
+    @GetMapping("/admin/users/getAllUsers")
+    public ResponseEntity<?> getAllUsers(
+            @RequestParam(value = "page", required = false, defaultValue =  "0") int page,
+            @RequestParam(value = "size", required = false, defaultValue =  "10") int size) {
+
+//        create pageable with sorting by creation date descending
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Page<UserProfileResponseDTO> users = userService.getAllUsers(pageable);
+
+//        Extract content and create paginated response which will remove uneccesary meta data
+        List<UserProfileResponseDTO> content = users.getContent();
+//
+        return ResponseEntity.ok(new PaginatedResponse<>(
+                content,
+                users.getTotalPages(),
+                users.getTotalElements()));
     }
 
 
