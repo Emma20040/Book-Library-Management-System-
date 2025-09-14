@@ -8,6 +8,10 @@ import com.library.management_system.repositories.UserRepository;
 import com.library.management_system.utils.JwtActions;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,7 @@ import org.springframework.core.io.Resource;
 
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -317,6 +322,7 @@ private UserProfileResponseDTO mapToProfileResponseDTO(UserModel user) {
 
 //count the total number of users
     public long countUsers() {
+
         return userRepository.count();
     }
 
@@ -326,6 +332,20 @@ private UserProfileResponseDTO mapToProfileResponseDTO(UserModel user) {
         UserModel user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "user not found"));
         return mapToProfileResponseDTO(user);
+    }
+
+
+//    get the profile information for all user information for only admins
+    public Page<UserProfileResponseDTO> getAllUsers(Pageable pageable) {
+        // sort ordering by creation date
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("createdAt").descending()
+        );
+
+        Page<UserModel> users= userRepository.findAll(sortedPageable);
+        return users.map(this::mapToProfileResponseDTO);
     }
 
 

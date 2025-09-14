@@ -20,21 +20,33 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
+//    make payments with this route
     @PostMapping("/create")
     public ResponseEntity<PaymentResponseDto> initiatePayment(@RequestBody PaymentRequestDto request) {
         PaymentResponseDto response = paymentService.initiatePayment(request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+//    user can use this route to see all their transactions
     @GetMapping("/transactions")
     public ResponseEntity<List<TransactionResponseDto>> getTransactionHistory() {
         List<TransactionResponseDto> transactions = paymentService.getTransactionHistory();
         return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 
+//    this route will let the user know if they have access to a book by returning true or false
     @GetMapping("/access/{bookId}")
     public ResponseEntity<Boolean> checkBookAccess(@PathVariable Long bookId) {
         boolean hasAccess = paymentService.hasAccessToBook(bookId);
         return new ResponseEntity<>(hasAccess, HttpStatus.OK);
     }
+
+//    count the number of transactions
+    @GetMapping("/countTotalTransactions")
+    public ResponseEntity<Long> countTransactions() {
+        Long totalTransactions = paymentService.getTotalTransactions();
+        return ResponseEntity.ok(totalTransactions);
+    }
+
+
 }

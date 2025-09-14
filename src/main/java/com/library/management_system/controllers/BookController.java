@@ -3,6 +3,8 @@ package com.library.management_system.controllers;
 
 import com.library.management_system.DTOs.BookRequestDTO;
 import com.library.management_system.DTOs.BookResponseDTO;
+import com.library.management_system.DTOs.PaginatedResponse;
+import com.library.management_system.models.Book;
 import com.library.management_system.services.BookService;
 import com.library.management_system.services.FileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,7 +117,7 @@ public class BookController {
             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
             @RequestParam(value = "search", required = false) String search) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("title").ascending());
-        Page<com.library.management_system.models.Book> bookPage;
+        Page<Book> bookPage;
         if (search != null && !search.isEmpty()) {
             bookPage = bookService.primarySearch(search, pageable);
         } else {
@@ -137,30 +139,40 @@ public class BookController {
     }
 
 
-    // Helper class for paginated response
-    public static class PaginatedResponse<T> {
-        private List<T> content;
-        private int totalPages;
-        private long totalElements;
+//    get the books by genre
+    @GetMapping("/genre")
+    public ResponseEntity<?> getBooksByGenre(
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+            @RequestParam(value ="genre", required = true) String genre) {
 
-        public PaginatedResponse(List<T> content, int totalPages, long totalElements) {
-            this.content = content;
-            this.totalPages = totalPages;
-            this.totalElements = totalElements;
-        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by("title").ascending());
+        Page<Book> bookPage= bookService.getBooksByGenre(genre, pageable);
+        List<BookResponseDTO> books = bookPage.getContent().stream()
+                .map(book -> new BookResponseDTO(
+                        book.getId(),
+                        book.getTitle(),
+                        book.getAuthor(),
+                        book.getIsbn(),
+                        book.getDescription(),
+                        book.getPdfPath(),
+                        book.getCoverImagePath(),
+                        book.getGenre(),
+                        book.getPublishedDate()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new PaginatedResponse<>(books, bookPage.getTotalPages(), bookPage.getTotalElements()));
 
-        public List<T> getContent() {
-            return content;
-        }
-
-        public int getTotalPages() {
-            return totalPages;
-        }
-
-        public long getTotalElements() {
-            return totalElements;
-        }
     }
+
+
+//    get the total number of books
+    @GetMapping("/countBooks")
+    public ResponseEntity<Long> getTotalBooks() {
+        Long totalBooks = bookService.countBooks();
+        return ResponseEntity.ok(totalBooks);
+    }
+
+
 }
 
 

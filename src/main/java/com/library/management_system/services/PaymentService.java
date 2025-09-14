@@ -286,4 +286,11 @@ public class PaymentService {
     }
 
 
+//    get the total number of transactions
+    public long getTotalTransactions() {
+        return transactionRepository.count();
+    }
+
+
+
 }

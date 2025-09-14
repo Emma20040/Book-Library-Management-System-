@@ -173,7 +173,7 @@ public BookResponseDTO updateBook(Long id, BookRequestDTO bookRequest, Multipart
         return cleanTitle + "-cover-" + System.currentTimeMillis() + extension;
     }
 
-//    search book by title or author or genre with recomadation if search doesn't exist
+//    search book by title or author or genre with recomendation if search doesn't exist
 public Page<Book> primarySearch(String searchWord, Pageable pageable) {
     try {
         return bookRepository.primarySearch(searchWord, pageable);
@@ -181,5 +181,19 @@ public Page<Book> primarySearch(String searchWord, Pageable pageable) {
         // Fallback to recommendation search if primary search is not found
         return bookRepository.recommendationSearch(searchWord, pageable);
     }
-}
+
+    }
+
+
+//    get book by genre
+    public Page<Book> getBooksByGenre(String genre, Pageable pageable){
+        return bookRepository.findByGenre(genre, pageable);
+    }
+
+
+//    counter the total number of books
+    public long countBooks() {
+        return bookRepository.count();
+    }
+
 }
