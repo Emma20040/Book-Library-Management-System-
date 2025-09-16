@@ -14,4 +14,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     @Query("SELECT t FROM Transaction t JOIN FETCH t.user WHERE t.stripePaymentIntentId = :stripePaymentIntentId")
     Optional<Transaction> findByStripePaymentIntentId(String stripePaymentIntentId);
     List<Transaction> findByUser(UserModel user);
+
+
+    long count();
 }
