@@ -3,6 +3,7 @@ package com.library.management_system.services;
 import com.library.management_system.DTOs.PaymentRequestDto;
 import com.library.management_system.DTOs.PaymentResponseDto;
 import com.library.management_system.DTOs.TransactionResponseDto;
+import com.library.management_system.enums.BookAccessType;
 import com.library.management_system.enums.PaymentStatus;
 import com.library.management_system.models.Book;
 import com.library.management_system.models.BookAccess;
@@ -72,11 +73,22 @@ public class PaymentService {
     }
     }
 
+//    check if book is free
+    private boolean isBookFree(Book book) {
+        return book.getAccessType() == BookAccessType.FREE;
+    }
+
     @Transactional
     public PaymentResponseDto initiatePayment(PaymentRequestDto request) {
         UserModel user = getCurrentUser();
         Book book = bookRepository.findById(request.getBookId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with ID: " + request.getBookId()));
+
+//        checks if book is free
+        if (isBookFree(book)) {
+            log.info("Free book accessed by user {}: {}", user.getId(), book.getTitle());
+            return new PaymentResponseDto(frontendUrl + "/api/books/"+"pdf-stream"+"/" + book.getId());
+        }
 
         // Check for duplicate purchase
         LocalDateTime currentDate = LocalDateTime.now();
@@ -118,7 +130,7 @@ public class PaymentService {
             SessionCreateParams sessionParams = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
                     .setCustomerEmail(user.getEmail())
-                    .setSuccessUrl(frontendUrl + "/payment/success")
+                    .setSuccessUrl(frontendUrl + "/api/books/"+"pdf-stream"+"/" + book.getId())
                     .setCancelUrl(frontendUrl + "/payment/failure")
                     .addLineItem(
                             SessionCreateParams.LineItem.builder()
@@ -282,6 +294,10 @@ public class PaymentService {
         UserModel user = getCurrentUser();
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with ID: " + bookId));
+//checks if book is free
+        if (isBookFree(book)) {
+            return true; // Free books are accessible to everyone
+        }
         return bookAccessRepository.findActiveAccess(user, book, LocalDateTime.now()).isPresent();
     }
 

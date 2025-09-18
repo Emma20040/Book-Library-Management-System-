@@ -2,6 +2,7 @@ package com.library.management_system.models;
 
 
 
+import com.library.management_system.enums.BookAccessType;
 import jakarta.persistence.*;
 
 import lombok.Data;
@@ -49,15 +50,30 @@ public class Book {
     @Column(name = "updated_at", nullable =true, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = updatedAt = LocalDateTime.now();
-    }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "access_type", nullable = false)
+    private BookAccessType accessType;
+
+
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = updatedAt = LocalDateTime.now();
+        if (this.accessType == null) {
+            if (this.pricePerMonth != null && this.pricePerMonth.compareTo(BigDecimal.ZERO) == 0) {
+                this.accessType = BookAccessType.FREE;
+            } else {
+                this.accessType = BookAccessType.PAID;
+            }
+        }
+    }
+
 
 
 
