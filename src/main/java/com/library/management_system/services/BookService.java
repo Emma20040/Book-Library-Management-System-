@@ -3,6 +3,7 @@ package com.library.management_system.services;
 
 import com.library.management_system.DTOs.BookRequestDTO;
 import com.library.management_system.DTOs.BookResponseDTO;
+import com.library.management_system.enums.BookAccessType;
 import com.library.management_system.models.Book;
 import com.library.management_system.repositories.BookRepository;
 import org.springframework.core.io.Resource;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +37,15 @@ public class BookService {
         book.setDescription(bookRequest.description());
         book.setPublishedDate(bookRequest.publishedDate());
         book.setGenre(bookRequest.genre());
+        book.setPricePerMonth(bookRequest.pricePerMonth());
+        book.setNumberOfPages(bookRequest.numberOfPages());
 
+//        SET accessType bases on PRICE per month ---
+        if (bookRequest.pricePerMonth().compareTo(BigDecimal.ZERO) == 0) {
+            book.setAccessType(BookAccessType.FREE);
+        } else {
+            book.setAccessType(BookAccessType.PAID);
+        }
 
         // Store files
         String pdfFilename = generatePdfFilename(bookRequest.title(), pdfFile.getOriginalFilename());
@@ -61,7 +71,10 @@ public class BookService {
                 book.getPdfPath(),
                 book.getCoverImagePath(),
                 book.getPublishedDate(),
-                book.getGenre()
+                book.getGenre(),
+                book.getPricePerMonth(),
+                book.getAccessType(),
+                book.getNumberOfPages()
         );
     }
 
@@ -95,6 +108,8 @@ public BookResponseDTO updateBook(Long id, BookRequestDTO bookRequest, Multipart
     if (bookRequest.description() != null) book.setDescription(bookRequest.description());
     if (bookRequest.publishedDate() != null) book.setPublishedDate(bookRequest.publishedDate());
     if (bookRequest.genre() != null) book.setGenre(bookRequest.genre());
+    if (bookRequest.pricePerMonth() != null) book.setPricePerMonth(bookRequest.pricePerMonth());
+
 
 
     // Update PDF file if provided
@@ -118,6 +133,13 @@ public BookResponseDTO updateBook(Long id, BookRequestDTO bookRequest, Multipart
             String coverPath = fileStorageService.storeCoverImage(coverImage, coverFilename);
             book.setCoverImagePath(coverPath);
         }
+
+//    --- AUTOMATICALLY UPDATE accessType BASED ON PRICE ---
+    if (bookRequest.pricePerMonth().compareTo(BigDecimal.ZERO) == 0) {
+        book.setAccessType(BookAccessType.FREE);
+    } else {
+        book.setAccessType(BookAccessType.PAID);
+    }
 
     Book updatedBook = bookRepository.save(book);
     return convertToDto(updatedBook);

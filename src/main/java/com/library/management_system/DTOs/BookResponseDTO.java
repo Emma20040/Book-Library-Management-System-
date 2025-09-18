@@ -1,6 +1,8 @@
 package com.library.management_system.DTOs;
 
 
+import com.library.management_system.enums.BookAccessType;
+
 import java.math.BigDecimal;
 
 public record BookResponseDTO(
@@ -12,5 +14,8 @@ public record BookResponseDTO(
         String pdfPath,
         String coverImagePath,
         String genre,
-        String publishedDate
+        String publishedDate,
+        BigDecimal pricePerMonth,
+        BookAccessType accessType,
+        int numberOfPages
 ) {}

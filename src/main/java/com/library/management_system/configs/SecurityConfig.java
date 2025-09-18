@@ -73,13 +73,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/payments/create").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/payments/access/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/payments/transactions").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/books/read/url/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/books/pdf-stream/**").authenticated()
 
                         // ADMIN ENDPOINTS
                         .requestMatchers("/user/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/books/genre").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/books/genre/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/books/countBooks").hasRole("ADMIN")
                         .requestMatchers("/countUsers").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/user/admin/users/**").hasRole("ADMIN")
