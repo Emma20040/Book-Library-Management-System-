@@ -43,7 +43,7 @@ public class UserModel {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-    /////////////////////////
+    ///////////////////////
 
     @Column()
     private String verificationToken;

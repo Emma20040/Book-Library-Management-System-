@@ -12,6 +12,7 @@ public record BookRequestDTO(
         String description,
         String genre,
         String publishedDate,
-        @NotBlank BigDecimal pricePerMonth
+        @NotBlank BigDecimal pricePerMonth,
+        @NotBlank int numberOfPages
 
 ) {}

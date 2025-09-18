@@ -7,6 +7,8 @@ import com.library.management_system.DTOs.PaginatedResponse;
 import com.library.management_system.models.Book;
 import com.library.management_system.services.BookService;
 import com.library.management_system.services.FileStorageService;
+import com.library.management_system.services.PaymentService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -18,8 +20,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -27,12 +32,14 @@ import java.util.stream.Collectors;
 public class BookController {
     private final BookService bookService;
     private final FileStorageService fileStorageService;
+    private final PaymentService paymentService;
 
 
 
-    public BookController(BookService bookService, FileStorageService fileStorageService) {
+    public BookController(BookService bookService, FileStorageService fileStorageService, PaymentService paymentService) {
         this.bookService = bookService;
         this.fileStorageService = fileStorageService;
+        this.paymentService = paymentService;
     }
 
 
@@ -85,7 +92,7 @@ public class BookController {
     }
 
 
-//      Get book PDF file for reading
+//      Get book PDF file for reading for admins only
     @GetMapping("/{id}/pdf")
     public ResponseEntity<Resource> getBookPdf(@PathVariable Long id) {
         Resource pdfResource = bookService.getBookPdf(id);
@@ -93,6 +100,50 @@ public class BookController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + pdfResource.getFilename() + "\"")
                 .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
+                .body(pdfResource);
+    }
+
+
+//    checks book access and returns pdf url instead of pdf file
+    @GetMapping("/read/url/{id}")
+    public ResponseEntity<?> readBook(@PathVariable Long id) {
+        // Check if user has access to this book
+        if (!paymentService.hasAccessToBook(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        // Get the book to retrieve PDF path
+        BookResponseDTO book = bookService.getBookById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
+
+        // Return the PDF path for the viewer instead of the file itself
+        Map<String, String> response = new HashMap<>();
+        response.put("pdfUrl", "/api/books/"+"/pdf-stream"+"/"+id);
+        response.put("bookTitle", book.title());
+        response.put("bookCover", book.coverImagePath());
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    // --- Secure PDF streaming for users which doesn't allow downloading---
+    @GetMapping("/pdf-stream/{id}")
+    public ResponseEntity<Resource> streamBookPdf(@PathVariable Long id,
+                                                  HttpServletResponse response) {
+        if (!paymentService.hasAccessToBook(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        Resource pdfResource = bookService.getBookPdf(id);
+
+        // Add headers to stop the broswer from caching and downloading
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Expires", "0");
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
+                // Remove filename to make saving harder
                 .body(pdfResource);
     }
 
@@ -133,7 +184,10 @@ public class BookController {
                         book.getPdfPath(),
                         book.getCoverImagePath(),
                         book.getGenre(),
-                        book.getPublishedDate()))
+                        book.getPublishedDate(),
+                        book.getPricePerMonth(),
+                        book.getAccessType(),
+                        book.getNumberOfPages()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new PaginatedResponse<>(books, bookPage.getTotalPages(), bookPage.getTotalElements()));
     }
@@ -158,7 +212,10 @@ public class BookController {
                         book.getPdfPath(),
                         book.getCoverImagePath(),
                         book.getGenre(),
-                        book.getPublishedDate()))
+                        book.getPublishedDate(),
+                        book.getPricePerMonth(),
+                        book.getAccessType(),
+                        book.getNumberOfPages()))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(new PaginatedResponse<>(books, bookPage.getTotalPages(), bookPage.getTotalElements()));
 
