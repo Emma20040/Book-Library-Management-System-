@@ -100,7 +100,6 @@ public class BookService {
 public BookResponseDTO updateBook(Long id, BookRequestDTO bookRequest, MultipartFile pdfFile, MultipartFile coverImage) {
     Book book = bookRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
-
     // Update basic book information
     if (bookRequest.title() != null) book.setTitle(bookRequest.title());
     if (bookRequest.author() != null) book.setAuthor(bookRequest.author());
