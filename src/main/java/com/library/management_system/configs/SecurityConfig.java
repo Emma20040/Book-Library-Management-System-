@@ -62,7 +62,9 @@ public class SecurityConfig {
                                 "/user/redeem-password",
                                 "/user/reset-password",
                                 "/api/books/search",
-                                "/webhook/payment"
+                                "/webhook/payment",
+                                "/api/mailing/subscribe",
+                                "/api/mailing/verify-email"
 
                         ).permitAll()
 
@@ -75,6 +77,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/payments/transactions").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/books/read/url/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/books/pdf-stream/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "api/contact").authenticated()
 
                         // ADMIN ENDPOINTS
                         .requestMatchers("/user/admin/**").hasRole("ADMIN")
