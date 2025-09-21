@@ -71,12 +71,17 @@ public class SecurityConfig {
                         // AUTHENTICATED ENDPOINTS
                         .requestMatchers(HttpMethod.POST, "/user/logout").authenticated()
                         .requestMatchers(HttpMethod.GET, "/user/profile").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/user/profile/picture").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/user/profile/picture").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/user/profile/picture").authenticated()
                         .requestMatchers(HttpMethod.PATCH, "/user/profile").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/payments/create").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/payments/access/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/payments/transactions").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/books/read/url/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/books/pdf-stream/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "api/books/bookDetails/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "api/books/cover/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "api/contact").authenticated()
 
                         // ADMIN ENDPOINTS
@@ -84,6 +89,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "api/books/pdf/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/books/genre/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/books/countBooks").hasRole("ADMIN")
                         .requestMatchers("/countUsers").hasRole("ADMIN")
