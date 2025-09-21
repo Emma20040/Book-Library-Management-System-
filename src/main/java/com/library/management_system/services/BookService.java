@@ -5,10 +5,13 @@ import com.library.management_system.DTOs.BookRequestDTO;
 import com.library.management_system.DTOs.BookResponseDTO;
 import com.library.management_system.enums.BookAccessType;
 import com.library.management_system.models.Book;
+import com.library.management_system.models.UserModel;
 import com.library.management_system.repositories.BookRepository;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -147,11 +150,14 @@ public BookResponseDTO updateBook(Long id, BookRequestDTO bookRequest, Multipart
 
 //    Get all books
 
-    public List<BookResponseDTO> getAllBooks() {
-        List<Book> books = bookRepository.findAll();
-        return books.stream()
-                .map(this::convertToDto)
-                .toList();
+    public Page<BookResponseDTO> getAllBooks(Pageable pageable) {
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("createdAt").descending()
+        );
+        Page<Book> book= bookRepository.findAll(sortedPageable);
+        return book.map(this::convertToDto);
     }
 
 
