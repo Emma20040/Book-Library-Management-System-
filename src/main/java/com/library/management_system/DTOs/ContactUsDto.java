@@ -6,7 +6,7 @@ public record ContactUsDto(
         String firstName,
         String lastName,
         String subject,
-        @NotBlank String email,
+         String email,
         @NotBlank String message
 
 ) {

@@ -84,10 +84,13 @@ public class PaymentService {
         Book book = bookRepository.findById(request.getBookId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found with ID: " + request.getBookId()));
 
+
+//        String successUrl = frontendUrl + "/?bookId=" + book.getId();
+//        String pdfStreamUrl = "/api/books/pdf-stream/" + book.getId();
 //        checks if book is free
         if (isBookFree(book)) {
             log.info("Free book accessed by user {}: {}", user.getId(), book.getTitle());
-            return new PaymentResponseDto(frontendUrl + "/api/books/"+"pdf-stream"+"/" + book.getId());
+            return new PaymentResponseDto(frontendUrl);
         }
 
         // Check for duplicate purchase
@@ -124,14 +127,17 @@ public class PaymentService {
         transaction.setPaymentStatus(PaymentStatus.PENDING);
         transaction.setTransactionDate(currentDate);
 
-
+//testing endpiont for redirection
+        String successUrl = "http://localhost:5502/payment-success.html?bookId=" + book.getId() + "&durationDays=" + request.getDurationDays();
+        String cancelUrl = "http://localhost:5502/cart.html?bookId=" + book.getId();
         // Create Stripe Checkout Session
         try {
             SessionCreateParams sessionParams = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
                     .setCustomerEmail(user.getEmail())
-                    .setSuccessUrl(frontendUrl + "/api/books/"+"pdf-stream"+"/" + book.getId())
-                    .setCancelUrl(frontendUrl + "/payment/failure")
+//                     .setSuccessUrl("https://example.com")
+                    .setSuccessUrl(successUrl)
+                    .setCancelUrl("https://example.com")
                     .addLineItem(
                             SessionCreateParams.LineItem.builder()
                                     .setQuantity(1L)
@@ -156,6 +162,7 @@ public class PaymentService {
 
             Session session = Session.create(sessionParams);
             transaction.setStripePaymentIntentId(session.getId());
+//            transaction.setStripePaymentIntentId(session.getPaymentIntent());
             transactionRepository.save(transaction);
 
             return new PaymentResponseDto(session.getUrl());
@@ -229,13 +236,32 @@ public class PaymentService {
             Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
             if (session == null) return;
 
+//            String paymentIntentId = session.getPaymentIntent(); // This gets the Payment Intent ID
+            String paymentIntentId = session.getId();
+            if (paymentIntentId == null) {
+                log.error("No payment intent found for session: {}", session.getId());
+                return;
+            }
+//            Transaction transaction = transactionRepository.findByStripePaymentIntentId(paymentIntentId)
+//                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found for payment intent ID: " + paymentIntentId));
+
+
             String sessionId = session.getId();
+            // Get the Payment Intent ID from the session, not the session ID itself
+//            String paymentIntentId = session.getPaymentIntent();
+//            if (paymentIntentId == null) {
+//                log.error("No payment intent found for session: {}", session.getId());
+//                return;
+//            }
             Transaction transaction = transactionRepository.findByStripePaymentIntentId(sessionId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found for session ID: " + sessionId));
+//            debuging test
+//            Transaction transaction = transactionRepository.findByStripePaymentIntentId(paymentIntentId)
+//                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found for payment intent ID: " + paymentIntentId));
 
             transaction.setPaymentStatus(PaymentStatus.PAID);
             transactionRepository.save(transaction);
-            transactionRepository.flush(); // Force immediate database write, this might solve the issue of some payments showning PENDING instead of PAID
+//            transactionRepository.flush(); // Force immediate database write, this might solve the issue of some payments showning PENDING instead of PAID
 
             BookAccess access = new BookAccess();
             access.setUser(transaction.getUser());
@@ -264,6 +290,7 @@ public class PaymentService {
         }
     }
 
+//    route for users to see their transaction history
     @Transactional(readOnly = true)
     public List<TransactionResponseDto> getTransactionHistory() {
         UserModel user = getCurrentUser();
