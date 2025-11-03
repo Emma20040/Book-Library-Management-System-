@@ -65,16 +65,19 @@ public class Book {
     @PrePersist
     protected void onCreate() {
         createdAt = updatedAt = LocalDateTime.now();
-        if (this.accessType == null) {
-            if (this.pricePerMonth != null && this.pricePerMonth.compareTo(BigDecimal.ZERO) == 0) {
-                this.accessType = BookAccessType.FREE;
-            } else {
-                this.accessType = BookAccessType.PAID;
-            }
-        }
+        if (this.pricePerMonth != null && this.pricePerMonth.stripTrailingZeros().compareTo(BigDecimal.ZERO) == 0) {
+        this.accessType = BookAccessType.FREE;
+    } else {
+        this.accessType = BookAccessType.PAID;
     }
+        }
+
 
 
 
 
 }
+
+
+
+

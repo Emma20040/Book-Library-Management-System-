@@ -48,6 +48,7 @@ public class Transaction {
     @Column(name = "transaction_date", nullable = false)
     private LocalDateTime transactionDate;
 
-    @Column(name = "stripe_payment_intent_id", nullable = false)
+//    set nullable to true for testing
+    @Column(name = "stripe_payment_intent_id", nullable =true)
     private String stripePaymentIntentId;
 }

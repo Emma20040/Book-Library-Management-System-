@@ -132,7 +132,7 @@ public class BookController {
 
             // Return the PDF path for the viewer instead of the file itself
             Map<String, String> response = new HashMap<>();
-            response.put("pdfUrl", "/api/books/" + "/pdf-stream" + "/" + id);
+             response.put("pdfUrl", "/api/books/pdf-stream/" + id);
             response.put("bookTitle", book.title());
             response.put("bookCover", book.coverImagePath());
 

@@ -22,6 +22,7 @@ import org.springframework.core.io.Resource;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Random;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -151,11 +152,11 @@ public String validateVerificationToken(String token) {
 //    -------- PASSWORD RESET --------
 //    send pasword reset email
     public void sendPasswordResetEmail(String email, String token){
-        String baseUrl ="http://localhost:8080";
-        String link = baseUrl + "/user/reset?token=" + token;
+//        String baseUrl ="http://localhost:8080";
+        String link =token;
 
         try {
-            emailService.sendEmail(email, "Password Reset Request", "Click the link to reset your password:  " + link);
+            emailService.sendEmail(email, "Password Reset Request", "Use this code to reset your password: " + link);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
@@ -165,7 +166,14 @@ public String validateVerificationToken(String token) {
     public void redeemPassword(String email){
         var user = findUserByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                 "Invalid email"));
-        var token = UUID.randomUUID().toString();
+//        var token = UUID.randomUUID().toString();
+        // Create a Random object
+        Random random = new Random();
+        // Generate a random integer between 0 and 999999 (inclusive)
+        int number = random.nextInt(1000000);
+
+        // Format the integer as a 6-digit string, padding with leading zeros if needed
+        String token = String.format("%06d", number);
         user.withResetToken(token, Instant.now().plusSeconds(this.tokenExpirationSeconds));
 
         userRepository.save(user);

@@ -31,7 +31,7 @@ public class ContactService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
-            // UPDATED: Handle JWT authentication
+            // Handle JWT authentication
             if (authentication.getPrincipal() instanceof Jwt) {
                 try {
                     Jwt jwt = (Jwt) authentication.getPrincipal();
@@ -80,7 +80,7 @@ public class ContactService {
 
         // Send HTML notification email to admin
         try {
-            String adminEmail = "emmanuelfongong10@gmail.com"; // Replace with your admin email
+            String adminEmail = "robertjones237@yahoo.com";
             String emailSubject = "New Support Message: " + contactUsDto.subject();
             String htmlContent =sendMessageToAdmin(savedMessage, user != null);
 
