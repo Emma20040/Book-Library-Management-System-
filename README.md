@@ -96,7 +96,7 @@ A robust digital library management system built with Spring Boot (Java 21) that
    mvn clean install
    mvn spring-boot:run
    ```
-   The app will be available at `http://localhost:8080`
+  
 
 ## 📚 API Documentation
 
