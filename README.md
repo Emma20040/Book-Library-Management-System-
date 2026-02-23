@@ -75,6 +75,12 @@ A robust digital library management system built with Spring Boot (Java 21) that
    jwt.public-key= classpath:public.key
    JWT_EXPIRATION=8600000
    
+   # how to create the asymetric keys used here
+  - cd src/main/resources
+  - openssl genrsa > private.key
+  - openssl rsa -in private.key -pubout -out public.key
+
+   
    # Email
    MAIL_HOST=smtp.example.com
    MAIL_PORT=587

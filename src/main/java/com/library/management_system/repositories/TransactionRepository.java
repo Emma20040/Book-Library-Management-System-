@@ -5,6 +5,7 @@ import com.library.management_system.models.Transaction;
 import com.library.management_system.models.UserModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +18,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
 
     long count();
+
+    @Query("SELECT COUNT(t) FROM Transaction t  WHERE t.user = :user")
+    long countAllTransations(@Param("user") UserModel user);
+
 }
