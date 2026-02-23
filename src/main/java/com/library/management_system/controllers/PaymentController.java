@@ -49,4 +49,12 @@ public class PaymentController {
     }
 
 
+//    get the count for the total number of transaction made by user
+    @GetMapping("/countTotalTransactionsForUser")
+    public ResponseEntity<Long> countAllTransactionForUser(){
+        Long countTransactions = paymentService.countTotalTransationByuser();
+        return ResponseEntity.ok(countTransactions);
+    }
+
+
 }

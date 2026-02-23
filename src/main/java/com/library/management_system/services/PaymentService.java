@@ -334,6 +334,10 @@ public class PaymentService {
         return transactionRepository.count();
     }
 
-
+//    count the total number of transactions mad by a particular user
+public long countTotalTransationByuser(){
+    UserModel user = getCurrentUser();
+        return transactionRepository.countAllTransations(user);
+}
 
 }

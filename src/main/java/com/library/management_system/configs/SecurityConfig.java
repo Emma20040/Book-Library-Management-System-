@@ -86,6 +86,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/books/cover/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/books/genre/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/contact").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/payments/countTotalTransactionsForUser").authenticated()
 
                         // ADMIN ENDPOINTS
                         .requestMatchers("/user/admin/**").hasRole("ADMIN")
