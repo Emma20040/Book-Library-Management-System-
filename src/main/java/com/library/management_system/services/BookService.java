@@ -136,8 +136,8 @@ public BookResponseDTO updateBook(Long id, BookRequestDTO bookRequest, Multipart
             book.setCoverImagePath(coverPath);
         }
 
-//    --- AUTOMATICALLY UPDATE accessType BASED ON PRICE ---
-    if (bookRequest.pricePerMonth().compareTo(BigDecimal.ZERO) == 0) {
+//    automatically update accessType BASED ON PRICE
+    if (bookRequest.pricePerMonth().stripTrailingZeros().compareTo(BigDecimal.ZERO) == 0) {
         book.setAccessType(BookAccessType.FREE);
     } else {
         book.setAccessType(BookAccessType.PAID);

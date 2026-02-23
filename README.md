@@ -9,7 +9,7 @@ A robust digital library management system built with Spring Boot (Java 21) that
 - Email verification
 - Password reset functionality
 - Role-based access control (Admin/User)
-- Session management
+
 
 ### 📖 Book Management
 - Full CRUD operations for books
@@ -37,10 +37,10 @@ A robust digital library management system built with Spring Boot (Java 21) that
 
 ## 🛠 Tech Stack
 
-- **Backend**: Spring Boot 3.1.0, Java 21
+- **Backend**: Spring Boot, Java 21
 - **Security**: Spring Security, JWT
 - **Database**: MySQL
-- **File Storage**: Local file system
+- **File Storage**: AWS S3
 - **Payment**: Stripe Integration
 - **Email**: JavaMailSender
 - **Build Tool**: Maven
@@ -71,8 +71,15 @@ A robust digital library management system built with Spring Boot (Java 21) that
    DB_PASSWORD=your_password
    
    # JWT
-   JWT_SECRET=your_jwt_secret
-   JWT_EXPIRATION=86400000
+   jwt.private-key=classpath:private.key
+   jwt.public-key= classpath:public.key
+   JWT_EXPIRATION=8600000
+   
+   # how to create the asymetric keys used here
+  - cd src/main/resources
+  - openssl genrsa > private.key
+  - openssl rsa -in private.key -pubout -out public.key
+
    
    # Email
    MAIL_HOST=smtp.example.com
@@ -95,7 +102,7 @@ A robust digital library management system built with Spring Boot (Java 21) that
    mvn clean install
    mvn spring-boot:run
    ```
-   The app will be available at `http://localhost:8080`
+  
 
 ## 📚 API Documentation
 
@@ -105,7 +112,6 @@ For detailed API endpoints and usage, see [API Documentation](USER_API_DOCUMENTA
 
 - JWT Authentication
 - BCrypt password hashing
-- CSRF Protection
 - CORS Configuration
 - Input Validation
 - Secure File Uploads
@@ -117,12 +123,17 @@ Run tests with:
 mvn test
 ```
 
+## Reference
+-https://www.codingshuttle.com/blogs/integrating-stripe-payments-in-spring-boot-step-by-step-beginner-s-guide-2025/
+-https://dev.to/mspilari/login-system-with-jwt-token-and-email-reset-password-571
+
+
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create your feature branch (`git checkout -b feature/FeatureBranch`)
+3. Commit your changes (`git commit -m 'Add some New Feature`)
+4. Push to the branch (`git push origin feature/FeatureBranch`)
 5. Open a Pull Request
 
 ## 📄 License

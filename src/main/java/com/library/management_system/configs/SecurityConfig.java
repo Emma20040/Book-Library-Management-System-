@@ -1,6 +1,7 @@
 package com.library.management_system.configs;
 
-import com.library.management_system.services.JwtValidationService;
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,7 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import com.library.management_system.services.JwtValidationService;
 
 @Configuration
 @EnableWebSecurity
@@ -34,7 +35,8 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(Arrays.asList(
                 "http://127.0.0.1:5502",
-                "http://localhost:5502"
+                "http://localhost:5502",
+                "https://610e095b5a7c.ngrok-free.app"
 
 //                "https://e218876891ff.ngrok-free.app"
         ));
@@ -62,7 +64,7 @@ public class SecurityConfig {
                                 "/user/redeem-password",
                                 "/user/reset-password",
                                 "/api/books/search",
-                                "/webhook/payment",
+                                "/webhook/payment/**",
                                 "/api/mailing/subscribe",
                                 "/api/mailing/verify-email"
 
@@ -80,23 +82,24 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/payments/transactions").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/books/read/url/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/books/pdf-stream/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "api/books/bookDetails/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "api/books/cover/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "api/contact").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/books/bookDetails/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/books/cover/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/books/genre/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/contact").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/payments/countTotalTransactionsForUser").authenticated()
 
                         // ADMIN ENDPOINTS
                         .requestMatchers("/user/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/books/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "api/books/pdf/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/books/genre/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/books/pdf/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/books/countBooks").hasRole("ADMIN")
-                        .requestMatchers("/countUsers").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/countUsers").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/user/admin/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/user/admin/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/user/admin/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "api/payments/countTotalTransactions").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/payments/countTotalTransactions").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
