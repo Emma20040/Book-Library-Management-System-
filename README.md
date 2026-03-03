@@ -126,6 +126,8 @@ mvn test
 ## Reference
 -https://www.codingshuttle.com/blogs/integrating-stripe-payments-in-spring-boot-step-by-step-beginner-s-guide-2025/
 -https://dev.to/mspilari/login-system-with-jwt-token-and-email-reset-password-571
+- https://gist.github.com/ghulam2545/666eaa14c61c0bb2e4f393461f4a0193
+- https://medium.com/@AlexanderObregon/background-pdf-generation-with-spring-boot-and-queued-jobs-4dab47a8e458
 
 
 ## 🤝 Contributing

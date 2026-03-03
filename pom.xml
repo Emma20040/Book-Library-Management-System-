@@ -98,6 +98,19 @@
             <artifactId>stripe-java</artifactId>
             <version>29.5.0</version>
         </dependency>
+        <!-- For templating HTML with dynamic data. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
+        <!-- To convert HTML to PDF. -->
+        <dependency>
+            <groupId>org.xhtmlrenderer</groupId>
+            <artifactId>flying-saucer-pdf</artifactId>
+            <version>10.0.5</version>
+        </dependency>
 
     </dependencies>
 
