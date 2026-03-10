@@ -36,17 +36,20 @@ class FileStorageException extends RuntimeException {
 public class FileStorageService {
     private final Path pdfStorageLocation;
     private final Path coverImageStorageLocation;
-    public final Path profilePicturesLocation;
+    private final Path profilePicturesLocation;
+    private final Path pdfReportLocation;
 
     public FileStorageService() {
         this.pdfStorageLocation = Paths.get("uploads/books/pdfs").toAbsolutePath().normalize();
         this.coverImageStorageLocation = Paths.get("uploads/books/coverImages").toAbsolutePath().normalize();
         this.profilePicturesLocation = Paths.get("uploads/users/profilePictures").toAbsolutePath().normalize();
+        this.pdfReportLocation = Paths.get("uploads/reports/pdf").toAbsolutePath().normalize();
 
         try {
             Files.createDirectories(pdfStorageLocation);
             Files.createDirectories(coverImageStorageLocation);
             Files.createDirectories(profilePicturesLocation);
+            Files.createDirectories(pdfReportLocation);
         } catch (Exception ex) {
             throw new FileStorageException("Could not create the directory where the uploaded files will be stored.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -93,7 +96,7 @@ public class FileStorageService {
         return loadFile(pdfStorageLocation, filename);
     }
 
-    // Book Cover Methods
+    // allowed image formats
     public String storeCoverImage(MultipartFile file, String filename) {
         validateFile(file, 10 * 1024 * 1024, new String[]{"image/jpeg", "image/png", "image/gif", "image/webp"});
         return storeFile(file, coverImageStorageLocation, filename);

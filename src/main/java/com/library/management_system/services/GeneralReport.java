@@ -14,10 +14,23 @@ import java.util.Map;
 public class GeneralReport extends  AbstractBaseReportService{
     @Value("${app.template.statement:statement.ftl}")
     private String template;
+    private final PaymentService paymentService;
+    private final BookService bookService;
+    private final FileStorageService fileStorageService;
+    private final UserService userService;
 
 
-    protected GeneralReport(Configuration freemarkerConfiguration) {
+    protected GeneralReport(Configuration freemarkerConfiguration,
+                            PaymentService paymentService,
+                            BookService bookService,
+                            FileStorageService fileStorageService,
+                            UserService userService) {
         super(freemarkerConfiguration);
+        this.paymentService = paymentService;
+        this.bookService = bookService;
+        this.fileStorageService = fileStorageService;
+        this.userService = userService;
+
     }
 
     @Override
