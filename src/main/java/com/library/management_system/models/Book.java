@@ -14,10 +14,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
-@Entity // Marks this class as a JPA entity, mapped to a table in the database
-@Data // From Lombok, automatically generates getters, setters, toString, etc.
-@NoArgsConstructor // From Lombok, generates a no-argument constructor
-@AllArgsConstructor // From Lombok, generates a constructor with all arguments
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Book {
 
     @Id // Marks this field as the primary key of the table
