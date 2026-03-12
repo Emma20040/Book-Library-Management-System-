@@ -183,4 +183,26 @@ public class FileStorageService {
             throw new FileStorageException("Failed to delete file: " + filePath, e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    //  method for storing PDF from byte array (for report generation)
+    public String storePdf(byte[] content, String filename) {
+        // Validate filename
+        if (filename.contains("..")) {
+            throw new FileStorageException("Filename contains invalid path sequence: " + filename, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Path targetLocation = pdfReportLocation.resolve(filename);
+            Files.write(targetLocation, content);
+            return targetLocation.toString();  // Returns path, not storing in DB
+        } catch (IOException e) {
+            throw new FileStorageException("Could not store PDF file: " + filename, e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+//    Load pdf report
+    public Resource loadPdfReport(String filePath) {
+        String filename = Paths.get(filePath).getFileName().toString();
+        return loadFile(pdfReportLocation, filename);
+    }
 }

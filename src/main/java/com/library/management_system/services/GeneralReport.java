@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
+@Service("general-report")
 public class GeneralReport extends  AbstractBaseReportService{
-    @Value("${app.template.statement:statement.ftl}")
+    @Value("${app.template.report:report.ftl}")
     private String template;
     private final PaymentService paymentService;
     private final BookService bookService;
