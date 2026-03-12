@@ -25,6 +25,7 @@ public class PdfJobTracker {
     private LocalDateTime createdAt;
     private LocalDateTime completedAt;
 
+
     public UserModel getUser() {
         return user;
     }

@@ -100,6 +100,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/user/admin/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/user/admin/users/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/payments/countTotalTransactions").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "api/reports/general-report").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "api/reports/job/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "api/reports/download/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )
