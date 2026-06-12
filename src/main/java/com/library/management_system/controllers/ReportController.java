@@ -22,7 +22,7 @@ public class ReportController {
 
     @PostMapping("/general-report")
     public ResponseEntity<PdfJobTracker> generateRevenueReport() {
-        PdfJobTracker job = reportService.startRevenueReport();
+        PdfJobTracker job = reportService.startGeneralReport();
         return ResponseEntity.accepted().body(job);
     }
 
