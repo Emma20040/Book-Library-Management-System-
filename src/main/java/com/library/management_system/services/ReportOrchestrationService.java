@@ -38,10 +38,10 @@ public class ReportOrchestrationService {
     }
 
     // ----- Public methods for each report type -----
-    public PdfJobTracker startRevenueReport() {
+    public PdfJobTracker startGeneralReport() {
         UserModel currentUser = contactService.getCurrentAuthenticatedUser(); // get authenticated user
         PdfJobTracker job = createJob(currentUser);
-        generateRevenueReportAsync(job.getId());
+        generateGeneralReportAsync(job.getId());
         return job;
     }
 
@@ -63,7 +63,7 @@ public class ReportOrchestrationService {
 
     // ----- Separate async methods for each report type -----
     @Async
-    protected void generateRevenueReportAsync(Long jobId) {
+    protected void generateGeneralReportAsync(Long jobId) {
         ReportService reportGenerator = applicationContext.getBean("general-report", ReportService.class);
         generateReport(jobId, reportGenerator);
     }
@@ -90,7 +90,7 @@ public class ReportOrchestrationService {
             String filePath = fileStorageService.storePdf(pdfBytes, filename);
 
             job.setStatus("COMPLETED");
-            job.setFilePath(filePath);  // Only the path is stored in DB
+            job.setFilePath(filePath);
             job.setCompletedAt(LocalDateTime.now());
         } catch (Exception e) {
             job.setStatus("FAILED");
@@ -120,4 +120,7 @@ public class ReportOrchestrationService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to read report file");
         }
     }
+
 }
+
+
